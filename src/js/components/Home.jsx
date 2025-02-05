@@ -10,10 +10,10 @@ const Home = () => {
   const [todo, setTodo] = useState([]);
 
   return (
-    <div className="container justify-content-center">
+    <div className="container col-sm-7">
       <h1>to do list</h1>
-      <ul>
-        <li>
+      <div className="todoList">
+        <div className="inline-row">
           <input
             type="text"
             onChange={(e) => setInputValue(e.target.value)}
@@ -26,20 +26,28 @@ const Home = () => {
             }}
             placeholder="What needs to be done?"
           ></input>
-        </li>
+        </div>
         {todo.map((item, index) => (
-          <li>
-            {item}{" "}
-            <i
-              class="fa-solid fa-x"
-              onClick={() =>
-                setTodo(todo.filter((t, currentIndex) => index != currentIndex))
-              }
-            ></i>
-          </li>
+          <div className="inline-row">
+            <div id="hoverText">
+              {item}{" "}
+              <div id="hidden">
+                <i
+                  class="fa-solid fa-x"
+                  onClick={() =>
+                    setTodo(
+                      todo.filter((t, currentIndex) => index != currentIndex)
+                    )
+                  }
+                ></i>
+              </div>
+            </div>
+          </div>
         ))}
-        <li>{todo.length !== 0 ? "" : "no task - add a task"}</li>
-      </ul>
+      </div>
+      <div className="footer">
+        {todo.length !== 0 ? "" : "no tasks - add a task"}
+      </div>
     </div>
   );
 };

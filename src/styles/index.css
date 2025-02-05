@@ -1,19 +1,34 @@
 body {
-  background-color: lightgrey;
+  background-color: rgb(233, 228, 228);
   margin-top: 40px;
 }
 
-ul li {
-  border: 1px solid grey;
-  list-style: none;
+.inline-row {
   background-color: white;
+  padding: 3px 10px 3px 10px;
+  margin: auto;
 }
 
 input {
   border: none;
   width: 100%;
+  outline: none;
 }
 
-i {
+#hidden {
   float: inline-end;
+  display: none;
+  margin-right: 5px;
+}
+
+#hoverText:hover #hidden {
+  display: block;
+}
+
+h1 {
+  text-align: center;
+}
+
+.footer {
+  padding: 10px;
 }
