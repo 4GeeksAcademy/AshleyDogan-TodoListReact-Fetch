@@ -13,3 +13,7 @@ input {
   border: none;
   width: 100%;
 }
+
+i {
+  float: inline-end;
+}

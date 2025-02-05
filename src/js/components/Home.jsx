@@ -1,32 +1,45 @@
 import React, { useState } from "react";
 
-//include images into your bundle
-import rigoImage from "../../img/rigo-baby.jpg";
+//include images into your bundl
 import "../../styles/index.css";
-import { renderToNodeStream } from "react-dom/server";
 //create your first component
 
 const Home = () => {
   const [inputValue, setInputValue] = useState("");
 
-  const [todo, setTodo] = useState("");
+  const [todo, setTodo] = useState([]);
+
   return (
     <div className="container justify-content-center">
       <h1>to do list</h1>
-      <div className="container bg-light">
-        <div className="row">
+      <ul>
+        <li>
           <input
             type="text"
-            placeholder="What needs to be done?"
             onChange={(e) => setInputValue(e.target.value)}
             value={inputValue}
-            onSubmit={(e) => {
-              setTodo(todo.concat(e.target.inputValue));
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                setTodo(todo.concat(inputValue));
+                setInputValue("");
+              }
             }}
+            placeholder="What needs to be done?"
           ></input>
-        </div>
-      </div>
-      <div>number of tasks</div>
+        </li>
+        {todo.map((item, index) => (
+          <li>
+            {item}{" "}
+            <i
+              class="fa-solid fa-x"
+              onClick={() =>
+                setTodo(todo.filter((t, currentIndex) => index != currentIndex))
+              }
+            ></i>
+          </li>
+        ))}
+        <li>{todo.length !== 0 ? "" : "no task - add a task"}</li>
+      </ul>
     </div>
   );
 };
