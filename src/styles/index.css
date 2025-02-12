@@ -32,3 +32,7 @@ h1 {
 .footer {
   padding: 10px;
 }
+
+.todoList {
+  box-shadow: 2px 2px 7px 1px;
+}
