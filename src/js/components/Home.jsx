@@ -1,25 +1,71 @@
 import React, { useEffect, useState } from "react";
 
-//include images into your bundl
+
 import "../../styles/index.css";
-//create your first component
+
 
 const Home = () => {
 
-  // useEffect(() => {
-  //   fetch('https://playground.4geeks.com/todo/users/ashdogan')
-  //   .then(response => response.json())
-  //   .then(data => {
-  //       setTodo(data.todo)
-  //   })
-  //   .catch(error => console.log("Error: ", error))
-
-    
-  // }, [])
-
   const [inputValue, setInputValue] = useState("");
-
   const [todo, setTodo] = useState([]);
+
+  useEffect(() => {
+    fetch("https://playground.4geeks.com/apis/todo/")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error: ");
+        }
+        return response.json();
+      })
+      .then((data) => setTodo(data))
+      .catch((error) => console.error(error));
+  }, []); 
+
+  const addTask = (e) => {
+    if (e.key === "Enter" && inputValue.trim() !== "") {
+      const newTask = { label: inputValue, done: false };
+
+      fetch("https://playground.4geeks.com/apis/todo/", {
+        method: "POST",
+        body: JSON.stringify(newTask),
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setTodo([...todo, data]);
+          setInputValue("");
+        })
+        .catch((error) => console.error(error));
+    }
+  };
+  
+  const deleteTask = (taskId) => {
+    fetch(`https://playground.4geeks.com/apis/todo/${taskId}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error deleting task");
+        }
+        return response.json();
+      })
+      .then(() => {
+        setTodo(todo.filter((task) => task.id !== taskId)); 
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const clearTasks = () => {
+    Promise.all(
+      todo.map((task) =>
+        fetch(`https://playground.4geeks.com/apis/todo/${task.id}`, {
+          method: "DELETE",
+        })
+      )
+    )
+      .then(() => setTodo([]))
+      .catch((error) => console.error(error));
+  };
 
   return (
     <div className="container col-sm-7">
