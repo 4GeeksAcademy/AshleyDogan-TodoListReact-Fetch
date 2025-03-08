@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 //include images into your bundl
 import "../../styles/index.css";
 //create your first component
 
 const Home = () => {
+
+  // useEffect(() => {
+  //   fetch('https://playground.4geeks.com/todo/users/ashdogan')
+  //   .then(response => response.json())
+  //   .then(data => {
+  //       setTodo(data.todo)
+  //   })
+  //   .catch(error => console.log("Error: ", error))
+
+    
+  // }, [])
+
   const [inputValue, setInputValue] = useState("");
 
   const [todo, setTodo] = useState([]);
