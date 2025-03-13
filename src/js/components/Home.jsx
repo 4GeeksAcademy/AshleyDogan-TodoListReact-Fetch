@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import "../../styles/index.css";
 
 const Home = () => {
@@ -26,10 +27,7 @@ const Home = () => {
         body: JSON.stringify(newTask),
         headers: { "Content-Type": "application/json" },
       })
-        .then((response) => {
-          if (!response.ok) throw new Error("Error adding task");
-          return response.json();
-        })
+        .then((response) => response.json())
         .then((data) => {
           setTodo([...todo, data]);
           setInputValue("");
@@ -75,36 +73,38 @@ const Home = () => {
             type="text"
             onChange={(e) => setInputValue(e.target.value)}
             value={inputValue}
-            onKeyPress={addTask}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                setTodo(todo.concat(inputValue));
+                setInputValue("");
+              }
+            }}
             placeholder="What needs to be done?"
           ></input>
         </div>
-
         {todo.map((item, index) => (
-          <div className="inline-row" key={item.id}>
+          <div className="inline-row">
             <div id="hoverText">
-              {item.label}{" "}
+              {item}{" "}
               <div id="hidden">
                 <i
-                  className="fa-solid fa-x"
-                  onClick={() => deleteTask(item.id)}
+                  class="fa-solid fa-x"
+                  onClick={() =>
+                    setTodo(
+                      todo.filter((t, currentIndex) => index != currentIndex)
+                    )
+                  }
                 ></i>
               </div>
             </div>
           </div>
         ))}
       </div>
-
       <div className="footer">
-        {todo.length !== 0 ? (
-          <button onClick={clearTasks}>Clear All</button>
-        ) : (
-          "No tasks - add a task"
-        )}
+        {todo.length !== 0 ? "" : "no tasks - add a task"}
       </div>
     </div>
   );
 };
-
 
 export default Home;
