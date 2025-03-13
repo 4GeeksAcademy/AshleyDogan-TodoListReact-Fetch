@@ -6,30 +6,53 @@ const Home = () => {
   const [inputValue, setInputValue] = useState("");
   const [todo, setTodo] = useState([]);
 
+  // useEffect(() => {
+  //   fetch("https://playground.4geeks.com/todo/users/ashdogan")
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error("Error: ");
+  //       }
+  //       return response.json();
+  //     })
+  //     .then((data) => setTodo(data))
+  //     .catch((error) => console.error(error));
+  // }, []);
   useEffect(() => {
-    fetch("https://playground.4geeks.com/apis/todo/")
+    // const fetchTasks = () => {
+    fetch("https://playground.4geeks.com/todo/users/ashdogan")
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Error: ");
+          throw new Error("Error fetching data");
         }
         return response.json();
       })
-      .then((data) => setTodo(data))
+      .then((data) => {
+        console.log("Fetched data:", data);
+        if (Array.isArray(data.todos)) {
+          setTodo(data.todos);
+        } else {
+          setTodo([]);
+        }
+      })
       .catch((error) => console.error(error));
   }, []);
+//   fetchTasks(); 
+// }, [todo]);
 
   const addTask = (e) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
       const newTask = { label: inputValue, done: false };
 
-      fetch("https://playground.4geeks.com/apis/todo/", {
+      fetch("https://playground.4geeks.com/todo/todos/ashdogan", {
         method: "POST",
         body: JSON.stringify(newTask),
         headers: { "Content-Type": "application/json" },
       })
         .then((response) => response.json())
         .then((data) => {
-          setTodo([...todo, data]);
+          if (data && data.id) {
+            setTodo([...todo, data]);
+          }
           setInputValue("");
         })
         .catch((error) => console.error(error));
@@ -37,7 +60,7 @@ const Home = () => {
   };
 
   const deleteTask = (taskId) => {
-    fetch(`https://playground.4geeks.com/apis/todo/${taskId}`, {
+    fetch(`https://playground.4geeks.com/todo/todos/${taskId}`, {
       method: "DELETE",
     })
       .then((response) => {
@@ -47,19 +70,24 @@ const Home = () => {
         return response.json();
       })
       .then(() => {
-        setTodo(todo.filter((task) => task.id !== taskId));
+
+        fetch("https://playground.4geeks.com/todo/users/ashdogan")
+          .then((response) => response.json())
+          .then((data) => {
+            if (Array.isArray(data.todos)) {
+              setTodo(data.todos);
+            } else {
+              setTodo([]);
+            }
+          })
+          .catch((error) => console.error("Error fetching updated list:", error));
       })
       .catch((error) => console.error(error));
   };
-
-  const clearTasks = () => {
-    Promise.all(
-      todo.map((task) =>
-        fetch(`https://playground.4geeks.com/apis/todo/${task.id}`, {
-          method: "DELETE",
-        })
-      )
-    )
+  const clearUser = () => {
+    fetch(`https://playground.4geeks.com/todo/users/ashdogan`, {
+      method: "DELETE",
+    })
       .then(() => setTodo([]))
       .catch((error) => console.error(error));
   };
@@ -75,25 +103,20 @@ const Home = () => {
             value={inputValue}
             onKeyPress={(e) => {
               if (e.key === "Enter") {
-                setTodo(todo.concat(inputValue));
-                setInputValue("");
+                addTask(e);
               }
             }}
             placeholder="What needs to be done?"
           ></input>
         </div>
-        {todo.map((item, index) => (
-          <div className="inline-row">
+        {todo.map((task, index) => (
+          <div className="inline-row" key={index}>
             <div id="hoverText">
-              {item}{" "}
+              {task.label}{" "}
               <div id="hidden">
                 <i
-                  class="fa-solid fa-x"
-                  onClick={() =>
-                    setTodo(
-                      todo.filter((t, currentIndex) => index != currentIndex)
-                    )
-                  }
+                  className="fa-solid fa-x"
+                  onClick={() => deleteTask(task.id)}
                 ></i>
               </div>
             </div>
