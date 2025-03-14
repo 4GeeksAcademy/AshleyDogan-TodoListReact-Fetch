@@ -6,38 +6,37 @@ const Home = () => {
   const [inputValue, setInputValue] = useState("");
   const [todo, setTodo] = useState([]);
 
-  // useEffect(() => {
-  //   fetch("https://playground.4geeks.com/todo/users/ashdogan")
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Error: ");
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data) => setTodo(data))
-  //     .catch((error) => console.error(error));
-  // }, []);
-  useEffect(() => {
-    // const fetchTasks = () => {
-    fetch("https://playground.4geeks.com/todo/users/ashdogan")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error fetching data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Fetched data:", data);
-        if (Array.isArray(data.todos)) {
-          setTodo(data.todos);
-        } else {
-          setTodo([]);
-        }
-      })
-      .catch((error) => console.error(error));
-  }, []);
-//   fetchTasks(); 
-// }, [todo]);
+  async function createTodoList() {
+    let options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    let response = await fetch(
+      "https://playground.4geeks.com/todo/users/ashdogan",
+      options
+    );
+    if (response.status !== 201) {
+      alert("your todo list was not successfully created");
+    } else {
+      fetchTasks();
+    }
+  }
+
+  const fetchTasks = async () => {
+    let response = await fetch(
+      "https://playground.4geeks.com/todo/users/ashdogan"
+    );
+    if (response.status === 404) {
+      createTodoList();
+    } else if (response.status === 200) {
+      let data = await response.json();
+      setTodo(data.todos);
+    } else {
+      alert("Your Todos are temporaily unavailable, please try again later");
+    }
+  };
 
   const addTask = (e) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
@@ -59,31 +58,27 @@ const Home = () => {
     }
   };
 
-  const deleteTask = (taskId) => {
-    fetch(`https://playground.4geeks.com/todo/todos/${taskId}`, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error deleting task");
+  const deleteTask = async (taskId) => {
+    try {
+      let response = await fetch(
+        `https://playground.4geeks.com/todo/todos/${taskId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-        return response.json();
-      })
-      .then(() => {
-
-        fetch("https://playground.4geeks.com/todo/users/ashdogan")
-          .then((response) => response.json())
-          .then((data) => {
-            if (Array.isArray(data.todos)) {
-              setTodo(data.todos);
-            } else {
-              setTodo([]);
-            }
-          })
-          .catch((error) => console.error("Error fetching updated list:", error));
-      })
-      .catch((error) => console.error(error));
+      );
+      if (response.status !== 204) {
+        throw new Error("Error deleting task");
+      } else {
+        fetchTasks();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+
   const clearUser = () => {
     fetch(`https://playground.4geeks.com/todo/users/ashdogan`, {
       method: "DELETE",
@@ -91,6 +86,10 @@ const Home = () => {
       .then(() => setTodo([]))
       .catch((error) => console.error(error));
   };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   return (
     <div className="container col-sm-7">
